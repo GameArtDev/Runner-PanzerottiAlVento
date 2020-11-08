@@ -7,13 +7,23 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
 
     [SerializeField]
+    private int maxHealth = 3;
+    private int currentHealth;
+
+    #region player_movement
+
+    [SerializeField]
     private float speed = 10f;
     [SerializeField]
     private float jumpForce = 400f;
 
-    private bool isGrounded;
     [SerializeField]
-    private Transform groundCheck;
+    private int maxExtraJumps = 1;
+    private int extraJumps = 0;
+
+    private bool isGrounded = true;
+    [SerializeField]
+    private Transform groundCheck = null;
     [SerializeField]
     private float checkRadius = 0.5f;
     [SerializeField]
@@ -21,18 +31,21 @@ public class PlayerController : MonoBehaviour
 
 
     [SerializeField]
-    private int maxExtraJumps = 1;
-    private int extraJumps;
-
-    [SerializeField]
     private bool debugMovement = false;
     private float moveInput;
+
+
+    #endregion
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         extraJumps = maxExtraJumps;
+
+        currentHealth = maxHealth;
+        GameEvents.current.PlayerHealthChange(currentHealth);
     }
 
     // Update is called once per frame
@@ -60,23 +73,55 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (isGrounded)
-            {
-                Jump();
-            } else if (extraJumps > 0)
-            {
-                Jump();
-                extraJumps -= 1;
-            }
+            Jump();
         }
 
 
 
+
+        //For debug purposes
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            TakeDamage(1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Heal(1);
+        }
     }
 
     private void Jump()
     {
-        rb.velocity = Vector2.up * jumpForce;
+        if (isGrounded)
+        {
+            rb.velocity = Vector2.up * jumpForce;
+        }
+        else if (extraJumps > 0)
+        {
+            rb.velocity = Vector2.up * jumpForce;
+            extraJumps -= 1;
+        }
 
     }
+       
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Died");
+        }
+        GameEvents.current.PlayerHealthChange(currentHealth);
+    }
+
+    public void Heal(int amount)
+    {
+        if (currentHealth < maxHealth)
+        {
+            currentHealth += amount;
+        }
+        GameEvents.current.PlayerHealthChange(currentHealth);
+    }
+
 }
