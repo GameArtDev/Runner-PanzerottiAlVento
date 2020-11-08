@@ -10,6 +10,10 @@ public class PlayerController : MonoBehaviour
     private int maxHealth = 3;
     private int currentHealth;
 
+    [SerializeField]
+    private float invulnerabiltySeconds = 2f;
+    private bool isInvulnerable = false;
+
     #region player_movement
 
     [SerializeField]
@@ -107,12 +111,27 @@ public class PlayerController : MonoBehaviour
        
     public void TakeDamage(int amount)
     {
-        currentHealth -= amount;
-        if (currentHealth <= 0)
+        if (!isInvulnerable)
         {
-            Debug.Log("Died");
+            currentHealth -= amount;
+            //TODO add animations
+            if (currentHealth <= 0)
+            {
+                Debug.Log("Died");
+            }
+            else
+            {
+                StartCoroutine("InvulnerabilityCo");
+            }
+            GameEvents.current.PlayerHealthChange(currentHealth);
         }
-        GameEvents.current.PlayerHealthChange(currentHealth);
+    }
+
+    private IEnumerator InvulnerabilityCo()
+    {
+        isInvulnerable = true;
+        yield return new WaitForSeconds(invulnerabiltySeconds);
+        isInvulnerable = false;
     }
 
     public void Heal(int amount)
