@@ -8,7 +8,7 @@ public class HealthUI : MonoBehaviour
     TextMeshProUGUI textMesh;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         textMesh = GetComponent<TextMeshProUGUI>();
         GameEvents.current.onPlayerHealthChange += OnHealthChange;

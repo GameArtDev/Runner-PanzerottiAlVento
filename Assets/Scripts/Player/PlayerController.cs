@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform groundCheck = null;
     [SerializeField]
-    private float checkRadius = 0.5f;
+    private float checkDist = 0.5f;
     [SerializeField]
     private LayerMask whatIsGround;
 
@@ -55,21 +55,22 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
-
-        if (debugMovement)
-        {
-            moveInput = Input.GetAxisRaw("Horizontal");
-        } else
-        {
-            moveInput = 1;
-        }
+        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, checkDist, whatIsGround);
 
         rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
     }
 
     private void Update()
     {
+        if (debugMovement)
+        {
+            moveInput = Input.GetAxisRaw("Horizontal");
+        }
+        else
+        {
+            moveInput = 1;
+        }
+
         if (isGrounded)
         {
             extraJumps = maxExtraJumps;
@@ -142,5 +143,4 @@ public class PlayerController : MonoBehaviour
         }
         GameEvents.current.PlayerHealthChange(currentHealth);
     }
-
 }
