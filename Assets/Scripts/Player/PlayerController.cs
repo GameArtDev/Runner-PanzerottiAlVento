@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private int maxExtraJumps = 1;
     private int extraJumps = 0;
+    private bool isJumping = false;
 
     private bool isGrounded = true;
     [SerializeField]
@@ -71,7 +72,12 @@ public class PlayerController : MonoBehaviour
             moveInput = 1;
         }
 
-        if (isGrounded)
+        if (rb.velocity.y <= 0)
+        {
+            isJumping = false;
+        }
+
+        if (isGrounded & !isJumping)
         {
             extraJumps = maxExtraJumps;
         }
@@ -100,10 +106,12 @@ public class PlayerController : MonoBehaviour
     {
         if (isGrounded)
         {
+            isJumping = true;
             rb.velocity = Vector2.up * jumpForce;
         }
         else if (extraJumps > 0)
         {
+            isJumping = true;
             rb.velocity = Vector2.up * jumpForce;
             extraJumps -= 1;
         }
