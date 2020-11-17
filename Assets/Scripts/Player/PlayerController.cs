@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviour
     private int maxExtraJumps = 1;
     private int extraJumps = 0;
     private bool isJumping = false;
+    [SerializeField]
+    private float maxTimeJump = 0.5f;
+    private float timerJump = 0f;
 
     private bool isGrounded = true;
     [SerializeField]
@@ -48,6 +51,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         extraJumps = maxExtraJumps;
+        timerJump = 0f;
 
         currentHealth = maxHealth;
         GameEvents.current.PlayerHealthChange(currentHealth);
@@ -72,50 +76,63 @@ public class PlayerController : MonoBehaviour
             moveInput = 1;
         }
 
+        HandleJumping();
+    }
+
+    private void HandleJumping()
+    {
         if (rb.velocity.y <= 0)
         {
             isJumping = false;
         }
 
-        if (isGrounded & !isJumping)
+        if (isGrounded && !isJumping)
         {
             extraJumps = maxExtraJumps;
+            timerJump = 0f;
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            if (isGrounded)
+            {
+                isJumping = true;
+            } else
+            {
+                if (extraJumps > 0)
+                {
+                    isJumping = true;
+                    extraJumps -= 1;
+                    timerJump = 0f;
+                }
+            }
+        }
+
+        if (Input.GetKey(KeyCode.Space))
+        {
             Jump();
         }
 
-
-
-
-        //For debug purposes
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Input.GetKeyUp(KeyCode.Space))
         {
-            TakeDamage(1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            Heal(1);
+            isJumping = false;
         }
     }
 
     private void Jump()
     {
-        if (isGrounded)
+        if (isJumping)
         {
-            isJumping = true;
-            rb.velocity = Vector2.up * jumpForce;
+            if (timerJump < maxTimeJump)
+            {
+                timerJump += Time.deltaTime;
+                rb.velocity = Vector2.up * jumpForce;
+            }
+            else
+            {
+                isJumping = false;
+            }
         }
-        else if (extraJumps > 0)
-        {
-            isJumping = true;
-            rb.velocity = Vector2.up * jumpForce;
-            extraJumps -= 1;
-        }
-
     }
        
     public void TakeDamage(int amount)
