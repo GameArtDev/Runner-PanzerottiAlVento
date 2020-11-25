@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour
     private float invulnerabiltySeconds = 2f;
     private bool isInvulnerable = false;
 
+    private float fallThreshold = -7f;
+
+    private Vector2 lastCheckpoint;
+
     #region player_movement
 
     [SerializeField]
@@ -55,6 +59,11 @@ public class PlayerController : MonoBehaviour
 
         currentHealth = maxHealth;
         GameEvents.current.PlayerHealthChange(currentHealth);
+
+        GameEvents.current.onCheckpointReached += RegisterCheckpoint;
+        lastCheckpoint = gameObject.transform.position;
+
+
     }
 
     // Update is called once per frame
@@ -76,7 +85,14 @@ public class PlayerController : MonoBehaviour
             moveInput = 1;
         }
 
-        HandleJumping();
+        if (transform.position.y < fallThreshold)
+        {
+            HandleFall();
+        }
+        else
+        {
+            HandleJumping();
+        }
     }
 
     private void HandleJumping()
@@ -143,7 +159,7 @@ public class PlayerController : MonoBehaviour
             //TODO add animations
             if (currentHealth <= 0)
             {
-                Debug.Log("Died");
+                Die();
             }
             else
             {
@@ -167,5 +183,31 @@ public class PlayerController : MonoBehaviour
             currentHealth += amount;
         }
         GameEvents.current.PlayerHealthChange(currentHealth);
+    }
+
+    private void Die()
+    {
+        Debug.Log("Died");
+    }
+
+    private void HandleFall()
+    {
+        TakeDamage(1);
+        Respawn();
+    }
+
+    private void RegisterCheckpoint(Transform checkpoint)
+    {
+        lastCheckpoint = checkpoint.position;
+    }
+
+    private void Respawn()
+    {
+        transform.position = lastCheckpoint;
+    }
+
+    private void OnDestroy()
+    {
+        GameEvents.current.onCheckpointReached -= RegisterCheckpoint;
     }
 }
