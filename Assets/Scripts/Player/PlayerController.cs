@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private int maxHealth = 3;
-    private int currentHealth;
+    private int currentHealth; 
 
     [SerializeField]
     private float invulnerabiltySeconds = 2f;
