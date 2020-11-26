@@ -19,4 +19,10 @@ public class GameEvents : MonoBehaviour
         onPlayerHealthChange?.Invoke(health);
     }
 
+    public event Action<Transform> onCheckpointReached;
+    public void CheckpointReached(Transform checkpoint)
+    {
+        onCheckpointReached?.Invoke(checkpoint);
+    }
+
 }
