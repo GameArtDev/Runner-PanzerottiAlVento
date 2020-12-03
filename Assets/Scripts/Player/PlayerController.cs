@@ -8,7 +8,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private int maxHealth = 3;
-    private int currentHealth; 
+    private int currentHealth;
+
+    [SerializeField]
+    private int score = 0;
 
     [SerializeField]
     private float invulnerabiltySeconds = 2f;
@@ -59,6 +62,8 @@ public class PlayerController : MonoBehaviour
 
         currentHealth = maxHealth;
         GameEvents.current.PlayerHealthChange(currentHealth);
+
+        GameEvents.current.PlayerScoreChange(score);
 
         GameEvents.current.onCheckpointReached += RegisterCheckpoint;
         lastCheckpoint = gameObject.transform.position;
@@ -209,5 +214,14 @@ public class PlayerController : MonoBehaviour
     private void OnDestroy()
     {
         GameEvents.current.onCheckpointReached -= RegisterCheckpoint;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Gem")
+        {
+            score += other.gameObject.GetComponent<Gem>().GetValue();
+            GameEvents.current.PlayerScoreChange(score);
+        }
     }
 }

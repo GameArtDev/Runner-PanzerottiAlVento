@@ -5,10 +5,13 @@ using UnityEngine;
 
 public class HealthUI : MonoBehaviour
 {
-    TextMeshProUGUI textMesh;
+    private TextMeshProUGUI textMesh;
+
+    [SerializeField]
+    private string healthText = "Life: ";
 
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         textMesh = GetComponent<TextMeshProUGUI>();
         GameEvents.current.onPlayerHealthChange += OnHealthChange;
@@ -16,7 +19,7 @@ public class HealthUI : MonoBehaviour
 
     private void OnHealthChange(int health)
     {
-        textMesh.text = "Life: " + health;
+        textMesh.text = healthText + health;
     }
 
     private void OnDestroy()

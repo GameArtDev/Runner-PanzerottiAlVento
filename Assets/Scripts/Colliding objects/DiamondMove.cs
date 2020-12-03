@@ -25,7 +25,7 @@ public class DiamondMove : MonoBehaviour
         if (collision.collider.tag =="Player")
         {
             Destroy(this.gameObject);
-            ScoreUI.OnAddDiamound();
+            //ScoreUI.OnAddDiamound();
         }
     }
 
