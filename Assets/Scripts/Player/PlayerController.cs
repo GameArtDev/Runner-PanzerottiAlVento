@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour
             isJumping = false;
         }
 
-        if (isGrounded && !isJumping)
+        if (isGrounded && !isJumping && rb.velocity.y == 0f)
         {
             extraJumps = maxExtraJumps;
             timerJump = 0f;
