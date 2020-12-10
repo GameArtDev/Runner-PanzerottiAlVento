@@ -186,6 +186,7 @@ public class PlayerController : MonoBehaviour
         if (currentHealth < maxHealth)
         {
             currentHealth += amount;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         }
         GameEvents.current.PlayerHealthChange(currentHealth);
     }
@@ -218,10 +219,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Gem")
+        if (other.gameObject.tag == "ScoreGem")
         {
             score += other.gameObject.GetComponent<Gem>().GetValue();
             GameEvents.current.PlayerScoreChange(score);
+        } else if (other.gameObject.tag == "HealingGem")
+        {
+            Heal(other.gameObject.GetComponent<Gem>().GetValue());
         }
     }
 }
