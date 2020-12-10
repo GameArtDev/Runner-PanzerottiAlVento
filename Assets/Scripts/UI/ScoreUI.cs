@@ -5,21 +5,26 @@ using UnityEngine;
 
 public class ScoreUI : MonoBehaviour
 {
-    private static TextMeshProUGUI textMesh;
-    private static string scoreText = "Gems: ";
-    private static int count = 0;
+    private TextMeshProUGUI textMesh;
+
+    [SerializeField]
+    private string scoreText = "Score: ";
 
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         textMesh = GetComponent<TextMeshProUGUI>();
-        textMesh.text = scoreText + count;
+        GameEvents.current.onPlayerScoreChange += OnScoreChange;
     }
 
-    public static void OnAddDiamound()
+    private void OnScoreChange(int newScore)
     {
-        count++;
-        textMesh.text = scoreText + count;
+        textMesh.text = scoreText + newScore;
+    }
+
+    private void OnDestroy()
+    {
+        GameEvents.current.onPlayerScoreChange -= OnScoreChange;
     }
 
 }

@@ -9,11 +9,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private int maxHealth = 3;
     private int currentHealth;
+    
     [SerializeField]
     Animator animator;
     [SerializeField]
     SpriteRenderer SR;
-   
+
+    [SerializeField]
+    private int score = 0;
+
     [SerializeField]
     private float invulnerabiltySeconds = 2f;
     private bool isInvulnerable = false;
@@ -60,9 +64,11 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         extraJumps = maxExtraJumps;
         timerJump = 0f;
-        
+
         currentHealth = maxHealth;
         GameEvents.current.PlayerHealthChange(currentHealth);
+
+        GameEvents.current.PlayerScoreChange(score);
 
         GameEvents.current.onCheckpointReached += RegisterCheckpoint;
         lastCheckpoint = gameObject.transform.position;
@@ -76,7 +82,6 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, checkDist, whatIsGround);
 
         rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-
         if (moveInput != 0)
         {
             if (moveInput > 0.001)
@@ -104,16 +109,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        
         if (debugMovement)
         {
             moveInput = Input.GetAxisRaw("Horizontal");
-            
         }
         else
         {
             moveInput = 1;
-          
         }
 
         if (transform.position.y < fallThreshold)
@@ -124,8 +126,6 @@ public class PlayerController : MonoBehaviour
         {
             HandleJumping();
         }
-
-     
     }
 
     private void HandleJumping()
@@ -133,14 +133,12 @@ public class PlayerController : MonoBehaviour
         if (rb.velocity.y <= 0)
         {
             isJumping = false;
-           
         }
 
-        if (isGrounded && !isJumping)
+        if (isGrounded && !isJumping && rb.velocity.y == 0f)
         {
             extraJumps = maxExtraJumps;
             timerJump = 0f;
-           
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -148,7 +146,6 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 isJumping = true;
-                
             } else
             {
                 if (extraJumps > 0)
@@ -156,7 +153,6 @@ public class PlayerController : MonoBehaviour
                     isJumping = true;
                     extraJumps -= 1;
                     timerJump = 0f;
-                    
                 }
             }
         }
@@ -180,13 +176,10 @@ public class PlayerController : MonoBehaviour
             {
                 timerJump += Time.deltaTime;
                 rb.velocity = Vector2.up * jumpForce;
-                
             }
             else
             {
                 isJumping = false;
-                
-
             }
         }
     }
@@ -221,6 +214,7 @@ public class PlayerController : MonoBehaviour
         if (currentHealth < maxHealth)
         {
             currentHealth += amount;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         }
         GameEvents.current.PlayerHealthChange(currentHealth);
     }
@@ -249,5 +243,17 @@ public class PlayerController : MonoBehaviour
     private void OnDestroy()
     {
         GameEvents.current.onCheckpointReached -= RegisterCheckpoint;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "ScoreGem")
+        {
+            score += other.gameObject.GetComponent<Gem>().GetValue();
+            GameEvents.current.PlayerScoreChange(score);
+        } else if (other.gameObject.tag == "HealingGem")
+        {
+            Heal(other.gameObject.GetComponent<Gem>().GetValue());
+        }
     }
 }
