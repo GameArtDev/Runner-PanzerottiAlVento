@@ -12,7 +12,7 @@ public class MoveBackground : MonoBehaviour
     void Start()
     {
         currentSpeed = speed;
-        //GameEvents.current.onChangeSpeedMultiplier += ChangeSpeed;
+        GameEvents.current.onChangeSpeedMultiplier += ChangeSpeed;
     }
 
     void ChangeSpeed(float newSpeedMultiplier)
@@ -28,6 +28,6 @@ public class MoveBackground : MonoBehaviour
 
     private void OnDestroy()
     {
-        //GameEvents.current.onChangeSpeedMultiplier -= ChangeSpeed;
+        GameEvents.current.onChangeSpeedMultiplier -= ChangeSpeed;
     }
 }
