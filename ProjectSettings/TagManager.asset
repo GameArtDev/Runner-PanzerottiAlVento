@@ -45,6 +45,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: UI
+    uniqueID: 2016014029
+    locked: 0
   - name: Platform
     uniqueID: 229805767
     locked: 0
@@ -53,7 +56,4 @@ TagManager:
     locked: 0
   - name: Collectible
     uniqueID: 2185362599
-    locked: 0
-  - name: UI
-    uniqueID: 2016014029
     locked: 0

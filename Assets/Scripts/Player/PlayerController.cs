@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private float speed = 10f;
+    private float speedMultiplier = 0;
     [SerializeField]
     private float jumpForce = 400f;
 
@@ -73,6 +74,7 @@ public class PlayerController : MonoBehaviour
         GameEvents.current.onCheckpointReached += RegisterCheckpoint;
         lastCheckpoint = gameObject.transform.position;
 
+        GameEvents.current.ChangeSpeedMultiplier(speedMultiplier);
 
     }
 
@@ -82,29 +84,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, checkDist, whatIsGround);
 
         rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-        if (moveInput != 0)
-        {
-            if (moveInput > 0.001)
-            {
-                SR.flipX = false;
-                animator.SetBool("IsRunning", true);
-            }
-           
-            else if (moveInput < -0.001)
-            {
-                SR.flipX = true;
-                animator.SetBool("IsRunning", true);
-            }
-                
-            
-        } 
-        else animator.SetBool("IsRunning", false);
-
-        if(isGrounded == true)
-        {
-            animator.SetBool("IsJump", false);
-        }
-        else animator.SetBool("IsJump", true);
+        
     }
 
     private void Update()
@@ -118,6 +98,37 @@ public class PlayerController : MonoBehaviour
             moveInput = 1;
         }
 
+        if (moveInput != 0)
+        {
+            ChangeSpeedMultiplier(moveInput);
+            if (moveInput > 0.001)
+            {
+                SR.flipX = false;
+                animator.SetBool("IsRunning", true);
+            }
+
+            else if (moveInput < -0.001)
+            {
+                SR.flipX = true;
+                animator.SetBool("IsRunning", true);
+            }
+
+
+        }
+        else
+        {
+            ChangeSpeedMultiplier(0);
+            animator.SetBool("IsRunning", false);
+        }
+
+        if (isGrounded == true)
+        {
+            animator.SetBool("IsJump", false);
+        }
+        else animator.SetBool("IsJump", true);
+
+
+
         if (transform.position.y < fallThreshold)
         {
             HandleFall();
@@ -126,6 +137,13 @@ public class PlayerController : MonoBehaviour
         {
             HandleJumping();
         }
+
+    }
+
+    private void ChangeSpeedMultiplier(float newSpeedMultiplier)
+    {
+        speedMultiplier = newSpeedMultiplier;
+        GameEvents.current.ChangeSpeedMultiplier(newSpeedMultiplier);
     }
 
     private void HandleJumping()
