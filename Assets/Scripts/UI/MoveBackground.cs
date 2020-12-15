@@ -8,11 +8,16 @@ public class MoveBackground : MonoBehaviour
     private float speed = 0;
     private float currentSpeed;
 
+    [SerializeField]
+    private bool moveWithPlayer = false;
+
     // Start is called before the first frame update
     void Start()
     {
         currentSpeed = speed;
-        GameEvents.current.onChangeSpeedMultiplier += ChangeSpeed;
+
+        if (moveWithPlayer)
+            GameEvents.current.onChangeSpeedMultiplier += ChangeSpeed;
     }
 
     void ChangeSpeed(float newSpeedMultiplier)
@@ -28,6 +33,7 @@ public class MoveBackground : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameEvents.current.onChangeSpeedMultiplier -= ChangeSpeed;
+        if (moveWithPlayer)
+            GameEvents.current.onChangeSpeedMultiplier -= ChangeSpeed;
     }
 }

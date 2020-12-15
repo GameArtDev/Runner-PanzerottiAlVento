@@ -127,6 +127,11 @@ public class PlayerController : MonoBehaviour
         }
         else animator.SetBool("IsJump", true);
 
+        if (rb.velocity.x == 0)
+        {
+            ChangeSpeedMultiplier(0);
+        }
+
 
 
         if (transform.position.y < fallThreshold)
