@@ -89,6 +89,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+
+        //TODO code to remove from here
         if (debugMovement)
         {
             moveInput = Input.GetAxisRaw("Horizontal");
@@ -121,15 +123,26 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("IsRunning", false);
         }
 
+        //To here
+
         if (isGrounded == true)
         {
-            animator.SetBool("IsJump", false);
+            animator.SetBool("IsJumping", false);
+            animator.SetBool("IsGrounding", true);
         }
-        else animator.SetBool("IsJump", true);
+        else
+        {
+            animator.SetBool("IsJumping", true);
+            animator.SetBool("IsGrounding", false);
+        }
 
         if (rb.velocity.x == 0)
         {
             ChangeSpeedMultiplier(0);
+            animator.SetBool("IsRunning", false);
+        } else
+        {
+            animator.SetBool("IsRunning", true);
         }
 
 
@@ -153,13 +166,16 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJumping()
     {
-        if (rb.velocity.y <= 0)
+        if (rb.velocity.y < 0)
         {
+            //The player is not jumping anymore and she is falling
             isJumping = false;
+            animator.SetBool("IsAscending", false);
         }
 
-        if (isGrounded && !isJumping && rb.velocity.y == 0f)
+        if (isGrounded && rb.velocity.y == 0f)
         {
+            //The player is standing on the ground
             extraJumps = maxExtraJumps;
             timerJump = 0f;
         }
@@ -169,6 +185,8 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 isJumping = true;
+                animator.SetBool("IsJumping", true);
+                animator.SetBool("IsAscending", true);
             } else
             {
                 if (extraJumps > 0)
@@ -176,6 +194,8 @@ public class PlayerController : MonoBehaviour
                     isJumping = true;
                     extraJumps -= 1;
                     timerJump = 0f;
+                    animator.SetBool("IsJumping", true);
+                    animator.SetBool("IsAscending", true);
                 }
             }
         }
@@ -188,6 +208,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             isJumping = false;
+            animator.SetBool("IsAscending", false);
         }
     }
 
@@ -203,6 +224,8 @@ public class PlayerController : MonoBehaviour
             else
             {
                 isJumping = false;
+
+                animator.SetBool("IsAscending", false);
             }
         }
     }
