@@ -2858,10 +2858,10 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 6200000, guid: 3b452d8ff0df10249b952e106cea9662, type: 2}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.040906683, y: 0.17752886}
+  m_Offset: {x: 0.047781393, y: 0.17752886}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -2872,7 +2872,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.6525997, y: 1.4630499}
+  m_Size: {x: 0.6663492, y: 1.4630499}
   m_EdgeRadius: 0
 --- !u!114 &1013015565
 MonoBehaviour:
@@ -2888,9 +2888,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 3
   animator: {fileID: 1963178639}
-  SR: {fileID: 1963178638}
+  spriteRenderer: {fileID: 1963178638}
   score: 0
   invulnerabiltySeconds: 1.5
+  invulnerabiltyBlinkRate: 0.5
   speed: 5
   jumpForce: 6
   maxExtraJumps: 1
@@ -2916,7 +2917,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0.05, y: -0.57}
   serializedVersion: 2
-  m_Radius: 0.3461721
+  m_Radius: 0.32
 --- !u!1 &1051097680
 GameObject:
   m_ObjectHideFlags: 0
@@ -5220,13 +5221,13 @@ SpriteRenderer:
   m_SortingLayerID: -1800173519
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 5636637113274666865, guid: 2719654a1613f4242af81879f50f8dff,
+  m_Sprite: {fileID: 5636637113274666865, guid: faca4b868dffba44a8b42f347b3d8a77,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 5.47, y: 4.81}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

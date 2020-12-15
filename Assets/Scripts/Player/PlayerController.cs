@@ -13,13 +13,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Animator animator;
     [SerializeField]
-    SpriteRenderer SR;
+    SpriteRenderer spriteRenderer;
 
     [SerializeField]
     private int score = 0;
 
     [SerializeField]
     private float invulnerabiltySeconds = 2f;
+    [SerializeField]
+    private float invulnerabiltyBlinkRate = 0.5f;
     private bool isInvulnerable = false;
 
     private float fallThreshold = -7f;
@@ -75,7 +77,6 @@ public class PlayerController : MonoBehaviour
         lastCheckpoint = gameObject.transform.position;
 
         GameEvents.current.ChangeSpeedMultiplier(speedMultiplier);
-
     }
 
     // Update is called once per frame
@@ -105,13 +106,13 @@ public class PlayerController : MonoBehaviour
             ChangeSpeedMultiplier(moveInput);
             if (moveInput > 0.001)
             {
-                SR.flipX = false;
+                spriteRenderer.flipX = false;
                 animator.SetBool("IsRunning", true);
             }
 
             else if (moveInput < -0.001)
             {
-                SR.flipX = true;
+                spriteRenderer.flipX = true;
                 animator.SetBool("IsRunning", true);
             }
 
@@ -125,16 +126,11 @@ public class PlayerController : MonoBehaviour
 
         //To here
 
-        if (isGrounded == true)
+        /*if (isGrounded == true)
         {
-            animator.SetBool("IsJumping", false);
+            //animator.SetBool("IsJumping", false);
             animator.SetBool("IsGrounding", true);
-        }
-        else
-        {
-            animator.SetBool("IsJumping", true);
-            animator.SetBool("IsGrounding", false);
-        }
+        }*/
 
         if (rb.velocity.x == 0)
         {
@@ -171,11 +167,14 @@ public class PlayerController : MonoBehaviour
             //The player is not jumping anymore and she is falling
             isJumping = false;
             animator.SetBool("IsAscending", false);
+            animator.SetBool("IsGrounding", false);
         }
 
-        if (isGrounded && rb.velocity.y == 0f)
+        if (isGrounded && !isJumping && rb.velocity.y == 0f)
         {
             //The player is standing on the ground
+
+            animator.SetBool("IsGrounding", true);
             extraJumps = maxExtraJumps;
             timerJump = 0f;
         }
@@ -185,7 +184,7 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 isJumping = true;
-                animator.SetBool("IsJumping", true);
+                animator.SetBool("IsGrounding", false);
                 animator.SetBool("IsAscending", true);
             } else
             {
@@ -194,7 +193,6 @@ public class PlayerController : MonoBehaviour
                     isJumping = true;
                     extraJumps -= 1;
                     timerJump = 0f;
-                    animator.SetBool("IsJumping", true);
                     animator.SetBool("IsAscending", true);
                 }
             }
@@ -242,6 +240,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                animator.SetBool("IsDamaged", true);
                 StartCoroutine("InvulnerabilityCo");
             }
             GameEvents.current.PlayerHealthChange(currentHealth);
@@ -251,7 +250,19 @@ public class PlayerController : MonoBehaviour
     private IEnumerator InvulnerabilityCo()
     {
         isInvulnerable = true;
-        yield return new WaitForSeconds(invulnerabiltySeconds);
+
+        int numBlinks = (int) Mathf.Ceil(invulnerabiltySeconds / invulnerabiltyBlinkRate);
+
+        for (int i = 0; i < numBlinks; i++)
+        {
+            Color tmp = spriteRenderer.color;
+            tmp.a = Mathf.Abs(tmp.a - 1);
+            spriteRenderer.color = tmp;
+            yield return new WaitForSeconds(invulnerabiltyBlinkRate / 2);
+            tmp.a = Mathf.Abs(tmp.a - 1);
+            spriteRenderer.color = tmp;
+            yield return new WaitForSeconds(invulnerabiltyBlinkRate / 2);
+        }
         isInvulnerable = false;
     }
 
