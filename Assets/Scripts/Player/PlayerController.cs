@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private enum STATUS {ALIVE, DEAD };
+    private STATUS playerStatus = STATUS.ALIVE;
+
     private Rigidbody2D rb;
 
     [SerializeField]
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour
         lastCheckpoint = gameObject.transform.position;
 
         GameEvents.current.ChangeSpeedMultiplier(speedMultiplier);
+        GameEvents.current.ChangeSpeedMultiplier(speedMultiplier);
     }
 
     // Update is called once per frame
@@ -84,8 +88,10 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, checkDist, whatIsGround);
 
-        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-        
+        if (playerStatus != STATUS.DEAD)
+        {
+            rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
+        }
     }
 
     private void Update()
@@ -140,8 +146,6 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetBool("IsRunning", true);
         }
-
-
 
         if (transform.position.y < fallThreshold)
         {
@@ -240,7 +244,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                animator.SetBool("IsDamaged", true);
+                animator.SetTrigger("IsDamaged");
                 StartCoroutine("InvulnerabilityCo");
             }
             GameEvents.current.PlayerHealthChange(currentHealth);
@@ -278,7 +282,9 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("Died");
+        animator.SetTrigger("IsDead");
+        rb.bodyType = RigidbodyType2D.Static;
+        playerStatus = STATUS.DEAD;
     }
 
     private void HandleFall()
