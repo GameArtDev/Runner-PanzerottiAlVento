@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private STATUS playerStatus = STATUS.ALIVE;
 
     private Rigidbody2D rb;
+    private BoxCollider2D boxCollider;
 
     [SerializeField]
     private int maxHealth = 3;
@@ -68,6 +69,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
         extraJumps = maxExtraJumps;
         timerJump = 0f;
 
@@ -154,6 +156,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             HandleJumping();
+            HandleSlide();
         }
 
     }
@@ -162,6 +165,23 @@ public class PlayerController : MonoBehaviour
     {
         speedMultiplier = newSpeedMultiplier;
         GameEvents.current.ChangeSpeedMultiplier(newSpeedMultiplier);
+    }
+
+    private void HandleSlide()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftControl)){
+            if (isGrounded)
+            {
+                animator.SetBool("IsSliding", true);
+                boxCollider.enabled = false;
+            }
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftControl) || !isGrounded)
+        {
+            animator.SetBool("IsSliding", false);
+            boxCollider.enabled = true;
+        }
     }
 
     private void HandleJumping()
