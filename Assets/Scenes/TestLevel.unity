@@ -1523,6 +1523,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heart (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4185769074725890190, guid: db3fc64650934204cab0c626c9d3bf64,
+        type: 3}
+      propertyPath: value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4185769074725890191, guid: db3fc64650934204cab0c626c9d3bf64,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3262,6 +3267,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Heart
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185769074725890190, guid: db3fc64650934204cab0c626c9d3bf64,
+        type: 3}
+      propertyPath: value
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4185769074725890191, guid: db3fc64650934204cab0c626c9d3bf64,
         type: 3}
