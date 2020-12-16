@@ -169,7 +169,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleSlide()
     {
-        if (Input.GetKeyDown(KeyCode.LeftControl)){
+        if (Input.GetKey(KeyCode.LeftControl)){
             if (isGrounded)
             {
                 animator.SetBool("IsSliding", true);
