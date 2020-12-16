@@ -281,9 +281,10 @@ public class PlayerController : MonoBehaviour
     {
         if (!isInvulnerable)
         {
-            currentHealth -= amount;
+            currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
+
             //TODO add animations
-            if (currentHealth <= 0)
+            if (currentHealth == 0)
             {
                 Die();
             }
