@@ -52,7 +52,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform groundCheck = null;
     [SerializeField]
-    private float checkDist = 0.5f;
+    private float groundCheckDist = 0.5f;
+
+    [SerializeField]
+    private Transform shadowCheck = null;
+    [SerializeField]
+    private float shadowCheckDist = 0.5f;
+    private float distShadow = 0;
+    [SerializeField]
+    private GameObject shadow = null;
+
+
     [SerializeField]
     private LayerMask whatIsGround;
 
@@ -73,6 +83,8 @@ public class PlayerController : MonoBehaviour
         extraJumps = maxExtraJumps;
         timerJump = 0f;
 
+        distShadow = Vector3.Distance(transform.position, shadow.transform.position);
+
         currentHealth = maxHealth;
         GameEvents.current.PlayerHealthChange(currentHealth);
 
@@ -88,12 +100,25 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, checkDist, whatIsGround);
+        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDist, whatIsGround);
 
         if (playerStatus != STATUS.DEAD)
         {
             rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
         }
+
+        /*RaycastHit2D shadowHit = Physics2D.Raycast(shadowCheck.position, Vector2.down, shadowCheckDist, whatIsGround);
+        if (shadowHit)
+        {
+            shadow.gameObject.SetActive(true);
+            Debug.Log(shadowHit.point);
+            float dist = Vector3.Distance(transform.position, shadowHit.point);
+            shadow.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y -dist, transform.position.z);
+
+        } else
+        {
+            shadow.gameObject.SetActive(false);
+        }*/
     }
 
     private void Update()
