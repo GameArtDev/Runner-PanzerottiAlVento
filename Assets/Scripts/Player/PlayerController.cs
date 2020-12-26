@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private enum STATUS {ALIVE, DEAD };
+    private STATUS playerStatus = STATUS.ALIVE;
+
     private Rigidbody2D rb;
+    private BoxCollider2D boxCollider;
 
     [SerializeField]
     private int maxHealth = 3;
@@ -13,13 +17,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Animator animator;
     [SerializeField]
-    SpriteRenderer SR;
+    SpriteRenderer spriteRenderer;
 
     [SerializeField]
     private int score = 0;
 
     [SerializeField]
     private float invulnerabiltySeconds = 2f;
+    [SerializeField]
+    private float invulnerabiltyBlinkRate = 0.5f;
     private bool isInvulnerable = false;
 
     private float fallThreshold = -7f;
@@ -30,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private float speed = 10f;
+    private float speedMultiplier = 0;
     [SerializeField]
     private float jumpForce = 400f;
 
@@ -45,7 +52,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform groundCheck = null;
     [SerializeField]
-    private float checkDist = 0.5f;
+    private float groundCheckDist = 0.5f;
+
+    [SerializeField]
+    private Transform shadowCheck = null;
+    [SerializeField]
+    private float shadowCheckDist = 0.5f;
+    private float distShadow = 0;
+    [SerializeField]
+    private GameObject shadow = null;
+
+
     [SerializeField]
     private LayerMask whatIsGround;
 
@@ -62,8 +79,11 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
         extraJumps = maxExtraJumps;
         timerJump = 0f;
+
+        distShadow = Vector3.Distance(transform.position, shadow.transform.position);
 
         currentHealth = maxHealth;
         GameEvents.current.PlayerHealthChange(currentHealth);
@@ -73,42 +93,38 @@ public class PlayerController : MonoBehaviour
         GameEvents.current.onCheckpointReached += RegisterCheckpoint;
         lastCheckpoint = gameObject.transform.position;
 
-
+        GameEvents.current.ChangeSpeedMultiplier(speedMultiplier);
+        GameEvents.current.ChangeSpeedMultiplier(speedMultiplier);
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, checkDist, whatIsGround);
+        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDist, whatIsGround);
 
-        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-        if (moveInput != 0)
+        if (playerStatus != STATUS.DEAD)
         {
-            if (moveInput > 0.001)
-            {
-                SR.flipX = false;
-                animator.SetBool("IsRunning", true);
-            }
-           
-            else if (moveInput < -0.001)
-            {
-                SR.flipX = true;
-                animator.SetBool("IsRunning", true);
-            }
-                
-            
-        } 
-        else animator.SetBool("IsRunning", false);
-
-        if(isGrounded == true)
-        {
-            animator.SetBool("IsJump", false);
+            rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
         }
-        else animator.SetBool("IsJump", true);
+
+        /*RaycastHit2D shadowHit = Physics2D.Raycast(shadowCheck.position, Vector2.down, shadowCheckDist, whatIsGround);
+        if (shadowHit)
+        {
+            shadow.gameObject.SetActive(true);
+            Debug.Log(shadowHit.point);
+            float dist = Vector3.Distance(transform.position, shadowHit.point);
+            shadow.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y -dist, transform.position.z);
+
+        } else
+        {
+            shadow.gameObject.SetActive(false);
+        }*/
     }
 
     private void Update()
     {
+
+        //TODO code to remove from here
         if (debugMovement)
         {
             moveInput = Input.GetAxisRaw("Horizontal");
@@ -118,6 +134,46 @@ public class PlayerController : MonoBehaviour
             moveInput = 1;
         }
 
+        if (moveInput != 0)
+        {
+            ChangeSpeedMultiplier(moveInput);
+            if (moveInput > 0.001)
+            {
+                spriteRenderer.flipX = false;
+                animator.SetBool("IsRunning", true);
+            }
+
+            else if (moveInput < -0.001)
+            {
+                spriteRenderer.flipX = true;
+                animator.SetBool("IsRunning", true);
+            }
+
+
+        }
+        else
+        {
+            ChangeSpeedMultiplier(0);
+            animator.SetBool("IsRunning", false);
+        }
+
+        //To here
+
+        /*if (isGrounded == true)
+        {
+            //animator.SetBool("IsJumping", false);
+            animator.SetBool("IsGrounding", true);
+        }*/
+
+        if (rb.velocity.x == 0)
+        {
+            ChangeSpeedMultiplier(0);
+            animator.SetBool("IsRunning", false);
+        } else
+        {
+            animator.SetBool("IsRunning", true);
+        }
+
         if (transform.position.y < fallThreshold)
         {
             HandleFall();
@@ -125,18 +181,49 @@ public class PlayerController : MonoBehaviour
         else
         {
             HandleJumping();
+            HandleSlide();
+        }
+
+    }
+
+    private void ChangeSpeedMultiplier(float newSpeedMultiplier)
+    {
+        speedMultiplier = newSpeedMultiplier;
+        GameEvents.current.ChangeSpeedMultiplier(newSpeedMultiplier);
+    }
+
+    private void HandleSlide()
+    {
+        if (Input.GetKey(KeyCode.LeftControl)){
+            if (isGrounded)
+            {
+                animator.SetBool("IsSliding", true);
+                boxCollider.enabled = false;
+            }
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftControl) || !isGrounded)
+        {
+            animator.SetBool("IsSliding", false);
+            boxCollider.enabled = true;
         }
     }
 
     private void HandleJumping()
     {
-        if (rb.velocity.y <= 0)
+        if (rb.velocity.y < 0)
         {
+            //The player is not jumping anymore and she is falling
             isJumping = false;
+            animator.SetBool("IsAscending", false);
+            animator.SetBool("IsGrounding", false);
         }
 
         if (isGrounded && !isJumping && rb.velocity.y == 0f)
         {
+            //The player is standing on the ground
+
+            animator.SetBool("IsGrounding", true);
             extraJumps = maxExtraJumps;
             timerJump = 0f;
         }
@@ -146,6 +233,8 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 isJumping = true;
+                animator.SetBool("IsGrounding", false);
+                animator.SetBool("IsAscending", true);
             } else
             {
                 if (extraJumps > 0)
@@ -153,6 +242,7 @@ public class PlayerController : MonoBehaviour
                     isJumping = true;
                     extraJumps -= 1;
                     timerJump = 0f;
+                    animator.SetBool("IsAscending", true);
                 }
             }
         }
@@ -165,6 +255,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             isJumping = false;
+            animator.SetBool("IsAscending", false);
         }
     }
 
@@ -180,6 +271,8 @@ public class PlayerController : MonoBehaviour
             else
             {
                 isJumping = false;
+
+                animator.SetBool("IsAscending", false);
             }
         }
     }
@@ -188,14 +281,16 @@ public class PlayerController : MonoBehaviour
     {
         if (!isInvulnerable)
         {
-            currentHealth -= amount;
+            currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
+
             //TODO add animations
-            if (currentHealth <= 0)
+            if (currentHealth == 0)
             {
                 Die();
             }
             else
             {
+                animator.SetTrigger("IsDamaged");
                 StartCoroutine("InvulnerabilityCo");
             }
             GameEvents.current.PlayerHealthChange(currentHealth);
@@ -205,7 +300,19 @@ public class PlayerController : MonoBehaviour
     private IEnumerator InvulnerabilityCo()
     {
         isInvulnerable = true;
-        yield return new WaitForSeconds(invulnerabiltySeconds);
+
+        int numBlinks = (int) Mathf.Ceil(invulnerabiltySeconds / invulnerabiltyBlinkRate);
+
+        for (int i = 0; i < numBlinks; i++)
+        {
+            Color tmp = spriteRenderer.color;
+            tmp.a = Mathf.Abs(tmp.a - 1);
+            spriteRenderer.color = tmp;
+            yield return new WaitForSeconds(invulnerabiltyBlinkRate / 2);
+            tmp.a = Mathf.Abs(tmp.a - 1);
+            spriteRenderer.color = tmp;
+            yield return new WaitForSeconds(invulnerabiltyBlinkRate / 2);
+        }
         isInvulnerable = false;
     }
 
@@ -221,7 +328,9 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("Died");
+        animator.SetTrigger("IsDead");
+        rb.bodyType = RigidbodyType2D.Static;
+        playerStatus = STATUS.DEAD;
     }
 
     private void HandleFall()

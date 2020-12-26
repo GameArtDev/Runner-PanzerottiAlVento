@@ -31,4 +31,10 @@ public class GameEvents : MonoBehaviour
         onCheckpointReached?.Invoke(checkpoint);
     }
 
+    public event Action<float> onChangeSpeedMultiplier;
+    public void ChangeSpeedMultiplier(float newMultiplier)
+    {
+        onChangeSpeedMultiplier?.Invoke(newMultiplier);
+    }
+
 }
