@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
         distShadow = Vector3.Distance(transform.position, shadow.transform.position);
 
         currentHealth = maxHealth;
-        GameEvents.current.PlayerHealthChange(currentHealth);
+        GameEvents.current.PlayerHealthChange(currentHealth, maxHealth);
 
         GameEvents.current.PlayerScoreChange(score);
 
@@ -123,65 +123,68 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-
-        //TODO code to remove from here
-        if (debugMovement)
+        if (playerStatus != STATUS.DEAD)
         {
-            moveInput = Input.GetAxisRaw("Horizontal");
-        }
-        else
-        {
-            moveInput = 1;
-        }
-
-        if (moveInput != 0)
-        {
-            ChangeSpeedMultiplier(moveInput);
-            if (moveInput > 0.001)
+            //TODO code to remove from here
+            if (debugMovement)
             {
-                spriteRenderer.flipX = false;
+                moveInput = Input.GetAxisRaw("Horizontal");
+            }
+            else
+            {
+                moveInput = 1;
+            }
+
+            if (moveInput != 0)
+            {
+                ChangeSpeedMultiplier(moveInput);
+                if (moveInput > 0.001)
+                {
+                    spriteRenderer.flipX = false;
+                    animator.SetBool("IsRunning", true);
+                }
+
+                else if (moveInput < -0.001)
+                {
+                    spriteRenderer.flipX = true;
+                    animator.SetBool("IsRunning", true);
+                }
+
+
+            }
+            else
+            {
+                ChangeSpeedMultiplier(0);
+                animator.SetBool("IsRunning", false);
+            }
+
+            //To here
+
+            /*if (isGrounded == true)
+            {
+                //animator.SetBool("IsJumping", false);
+                animator.SetBool("IsGrounding", true);
+            }*/
+
+            if (rb.velocity.x == 0)
+            {
+                ChangeSpeedMultiplier(0);
+                animator.SetBool("IsRunning", false);
+            }
+            else
+            {
                 animator.SetBool("IsRunning", true);
             }
 
-            else if (moveInput < -0.001)
+            if (transform.position.y < fallThreshold)
             {
-                spriteRenderer.flipX = true;
-                animator.SetBool("IsRunning", true);
+                HandleFall();
             }
-
-
-        }
-        else
-        {
-            ChangeSpeedMultiplier(0);
-            animator.SetBool("IsRunning", false);
-        }
-
-        //To here
-
-        /*if (isGrounded == true)
-        {
-            //animator.SetBool("IsJumping", false);
-            animator.SetBool("IsGrounding", true);
-        }*/
-
-        if (rb.velocity.x == 0)
-        {
-            ChangeSpeedMultiplier(0);
-            animator.SetBool("IsRunning", false);
-        } else
-        {
-            animator.SetBool("IsRunning", true);
-        }
-
-        if (transform.position.y < fallThreshold)
-        {
-            HandleFall();
-        }
-        else
-        {
-            HandleJumping();
-            HandleSlide();
+            else
+            {
+                HandleJumping();
+                HandleSlide();
+            }
         }
 
     }
@@ -293,7 +296,7 @@ public class PlayerController : MonoBehaviour
                 animator.SetTrigger("IsDamaged");
                 StartCoroutine("InvulnerabilityCo");
             }
-            GameEvents.current.PlayerHealthChange(currentHealth);
+            GameEvents.current.PlayerHealthChange(currentHealth, maxHealth);
         }
     }
 
@@ -323,7 +326,7 @@ public class PlayerController : MonoBehaviour
             currentHealth += amount;
             currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         }
-        GameEvents.current.PlayerHealthChange(currentHealth);
+        GameEvents.current.PlayerHealthChange(currentHealth, maxHealth);
     }
 
     private void Die()
@@ -331,6 +334,7 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("IsDead");
         rb.bodyType = RigidbodyType2D.Static;
         playerStatus = STATUS.DEAD;
+        ChangeSpeedMultiplier(0);
     }
 
     private void HandleFall()

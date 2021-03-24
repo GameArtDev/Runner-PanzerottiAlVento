@@ -2,24 +2,41 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HealthUI : MonoBehaviour
 {
-    private TextMeshProUGUI textMesh;
-
     [SerializeField]
-    private string healthText = "Life: ";
+    private Image healthBar;
+    [SerializeField]
+    private SpriteRenderer healthFrame;
+    [SerializeField]
+    private Sprite aliveFrame;
+    [SerializeField]
+    private Sprite deadFrame;
+
+    //private TextMeshProUGUI textMesh;
+
+    //[SerializeField]
+    //private string healthText = "Life: ";
 
     // Start is called before the first frame update
     void Start()
     {
-        textMesh = GetComponent<TextMeshProUGUI>();
+        //textMesh = GetComponent<TextMeshProUGUI>();
         GameEvents.current.onPlayerHealthChange += OnHealthChange;
     }
 
-    private void OnHealthChange(int health)
+    private void OnHealthChange(int health, int maxHealth)
     {
-        textMesh.text = healthText + health;
+        if (health > 0)
+        {
+            healthFrame.sprite = aliveFrame;
+        } else
+        {
+            healthFrame.sprite = deadFrame;
+        }
+        healthBar.fillAmount = health / (float) maxHealth;
     }
 
     private void OnDestroy()

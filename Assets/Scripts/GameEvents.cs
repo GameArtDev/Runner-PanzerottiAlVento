@@ -13,10 +13,10 @@ public class GameEvents : MonoBehaviour
         current = this;
     }
 
-    public event Action<int> onPlayerHealthChange;
-    public void PlayerHealthChange(int newHealth)
+    public event Action<int, int> onPlayerHealthChange;
+    public void PlayerHealthChange(int newHealth, int maxHealth)
     {
-        onPlayerHealthChange?.Invoke(newHealth);
+        onPlayerHealthChange?.Invoke(newHealth, maxHealth);
     }
 
     public event Action<int> onPlayerScoreChange;
