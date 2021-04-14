@@ -2038,7 +2038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8651167157e433843817d761ed100b41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.25
+  speed: -0.25
   moveWithPlayer: 0
 --- !u!1 &325783497
 GameObject:
@@ -6035,7 +6035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8651167157e433843817d761ed100b41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.1
+  speed: -0.05
   moveWithPlayer: 0
 --- !u!1 &891267602
 GameObject:
@@ -16325,7 +16325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8651167157e433843817d761ed100b41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.5
+  speed: -0.5
   moveWithPlayer: 0
 --- !u!1001 &7555175342728037607
 PrefabInstance:

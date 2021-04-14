@@ -168,7 +168,7 @@ public class PlayerController : MonoBehaviour
 
             if (rb.velocity.x == 0)
             {
-                ChangeSpeedMultiplier(0);
+                //ChangeSpeedMultiplier(0);
                 animator.SetBool("IsRunning", false);
             }
             else
